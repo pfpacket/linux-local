@@ -1,12 +1,15 @@
 # $Id$
 # Maintainer: Ryo Munakata <afpacket@gmail.com>
 
-pkgname=linux-stable
+pkgname=linux-latest-stable
 #pkgbase=linux               # Build stock -ARCH kernel
 #pkgbase=linux-custom       # Build kernel with a different name
-_srcname=linux-3.11
-pkgver=3.11
-pkgrel=2
+_kernel_major=3.11
+_kernel_minor=5
+_kernel_version=${_kernel_major}.${_kernel_minor}
+_srcname=linux-${_kernel_version}
+pkgver=$_kernel_version
+pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
@@ -39,15 +42,18 @@ replaces=("kernel26${_kernelname}")
 backup=("etc/mkinitcpio.d/${pkgname}.preset")
 install=linux.install
 
+_git_tree_path="/home/devm33/Develop/kernel_dev/linux-stable"
+
 # module.symbols md5sums
 # x86_64
 # i686
 
 prepare() {
   rm -f "${srcdir}/${_srcname}"
-  ln -s /home/devm33/Develop/KernelDev/linux-stable "${srcdir}/${_srcname}"
+  ln -s "${_git_tree_path}" "${srcdir}/${_srcname}"
   cd "${srcdir}/${_srcname}"
-  git checkout for_build  # checkout the branch for build
+  git checkout linux-${_kernel_major}.y
+  git pull origin
 
   # add upstream patch
   # patch -p1 -i "${srcdir}/patch-${pkgver}"
@@ -94,7 +100,7 @@ build() {
   #make nconfig # new CLI menu for configuration
   #make xconfig # X-based configuration
   #make oldconfig # using old config from previous kernel version
-  yes ""|make oldconfig # Lazy version of oldconfig
+  yes "" | make oldconfig # Lazy version of oldconfig
   # ... or manually edit .config
 
   # rewrite configuration

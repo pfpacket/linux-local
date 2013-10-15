@@ -2,7 +2,7 @@
 # arg 2:  the old package version
 
 KERNEL_NAME=-latest-stable
-KERNEL_VERSION=3.11.0-2-latest-stable
+KERNEL_VERSION=3.11.5-1-latest-stable
 
 post_install () {
   # updating module dependencies
