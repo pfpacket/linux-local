@@ -4,9 +4,10 @@
 pkgname=linux-latest-stable
 #pkgbase=linux               # Build stock -ARCH kernel
 #pkgbase=linux-custom       # Build kernel with a different name
-_kernel_major=3.11
-_kernel_minor=5
-_kernel_version=${_kernel_major}.${_kernel_minor}
+_kernel_major=3.12
+_kernel_minor=0
+#_kernel_version=${_kernel_major}.${_kernel_minor}
+_kernel_version=${_kernel_major}
 _srcname=linux-${_kernel_version}
 pkgver=$_kernel_version
 pkgrel=1
