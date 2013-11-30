@@ -9,7 +9,7 @@ _kernel_minor=1
 _kernel_version=${_kernel_major}.${_kernel_minor}
 _srcname=linux-${_kernel_version}
 pkgver=$_kernel_version
-pkgrel=1
+pkgrel=2
 arch=('i686' 'x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
@@ -21,12 +21,14 @@ source=(# the main kernel config files
         'linux.preset'
         'change-default-console-loglevel.patch'
         'criu-no-expert.patch'
+        '3.12-btrfs-relocate-csums.patch'
         )
 md5sums=('SKIP'
          'SKIP'
          'eb14dcfd80c00852ef81ded6e826826a'
          '6257ec3bb23e00b7b92878ea0df5ff83'
          'd50c1ac47394e9aec637002ef3392bd1'
+         '923c1728634d4e0f7b77177c36d94791'
          )
 
 _kernelname=${pkgname#linux}
@@ -69,6 +71,11 @@ prepare() {
   # allow criu without expert option set
   # patch from fedora
   patch -Np1 -i "${srcdir}/criu-no-expert.patch"
+
+  # fix btrfs balance bug
+  # https://bugzilla.kernel.org/show_bug.cgi?id=63411
+  # https://bugs.archlinux.org/task/37867
+  patch -Np1 -i "${srcdir}/3.12-btrfs-relocate-csums.patch"
 
   if [ "${CARCH}" = "x86_64" ]; then
     cat "${srcdir}/config.x86_64" > ./.config
