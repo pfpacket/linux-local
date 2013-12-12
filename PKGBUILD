@@ -1,14 +1,15 @@
 # $Id$
 # Maintainer: Ryo Munakata <afpacket@gmail.com>
 
-pkgname=linux-latest-stable
+pkgname=linux-stable-rc
 #pkgbase=linux               # Build stock -ARCH kernel
 #pkgbase=linux-custom       # Build kernel with a different name
 _kernel_major=3.12
-_kernel_minor=4
+_kernel_minor=5
+_kernel_rc_num=1
 _kernel_version=${_kernel_major}.${_kernel_minor}
 _srcname=linux-${_kernel_version}
-pkgver=$_kernel_version
+pkgver=${_kernel_version}rc${_kernel_rc_num}
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.kernel.org/"
@@ -21,12 +22,14 @@ source=(# the main kernel config files
         'linux.preset'
         'change-default-console-loglevel.patch'
         'criu-no-expert.patch'
+        "http://www.kernel.org/pub/linux/kernel/v3.0/stable-review/patch-${_kernel_major}.${_kernel_minor}-rc${_kernel_rc_num}.gz"
         )
 md5sums=('SKIP'
          'SKIP'
          'eb14dcfd80c00852ef81ded6e826826a'
          '6257ec3bb23e00b7b92878ea0df5ff83'
          'd50c1ac47394e9aec637002ef3392bd1'
+         'SKIP'
          )
 
 _kernelname=${pkgname#linux}
@@ -69,6 +72,10 @@ prepare() {
   # allow criu without expert option set
   # patch from fedora
   patch -Np1 -i "${srcdir}/criu-no-expert.patch"
+
+  # stable-queue
+  # stable RC review patch
+  zcat "${srcdir}/patch-${_kernel_major}.${_kernel_minor}-rc${_kernel_rc_num}.gz" | patch -Np1
 
   if [ "${CARCH}" = "x86_64" ]; then
     cat "${srcdir}/config.x86_64" > ./.config
