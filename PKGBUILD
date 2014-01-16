@@ -5,7 +5,7 @@ pkgname=linux-latest-stable
 #pkgbase=linux               # Build stock -ARCH kernel
 #pkgbase=linux-custom       # Build kernel with a different name
 _kernel_major=3.12
-_kernel_minor=6
+_kernel_minor=8
 _kernel_version=${_kernel_major}.${_kernel_minor}
 _srcname=linux-${_kernel_version}
 pkgver=$_kernel_version
@@ -21,12 +21,24 @@ source=(# the main kernel config files
         'linux.preset'
         'change-default-console-loglevel.patch'
         'criu-no-expert.patch'
+        'sunrpc-create-a-new-dummy-pipe-for-gssd-to-hold-open.patch'
+        'sunrpc-replace-gssd_running-with-more-reliable-check.patch'
+        'nfs-check-gssd-running-before-krb5i-auth.patch'
+        'rpc_pipe-remove-the-clntXX-dir-if-creating-the-pipe-fails.patch'
+        'sunrpc-add-an-info-file-for-the-dummy-gssd-pipe.patch'
+        'rpc_pipe-fix-cleanup-of-dummy-gssd-directory-when-notification-fails.patch'
         )
 md5sums=('SKIP'
          'SKIP'
          'eb14dcfd80c00852ef81ded6e826826a'
-         '6257ec3bb23e00b7b92878ea0df5ff83'
+         '98beb36f9b8cf16e58de2483ea9985e3'
          'd50c1ac47394e9aec637002ef3392bd1'
+         'd4a75f77e6bd5d700dcd534cd5f0dfce'
+         'dc86fdc37615c97f03c1e0c31b7b833a'
+         '88eef9d3b5012ef7e82af1af8cc4e517'
+         'cec0bb8981936eab2943b2009b7a6fff'
+         '88d9cddf9e0050a76ec4674f264fb2a1'
+         'cb9016630212ef07b168892fbcfd4e5d'
          )
 
 _kernelname=${pkgname#linux}
@@ -69,6 +81,16 @@ prepare() {
   # allow criu without expert option set
   # patch from fedora
   patch -Np1 -i "${srcdir}/criu-no-expert.patch"
+
+  # fix 15 seocnds nfs delay
+  patch -Np1 -i "${srcdir}/sunrpc-create-a-new-dummy-pipe-for-gssd-to-hold-open.patch"
+  patch -Np1 -i "${srcdir}/sunrpc-replace-gssd_running-with-more-reliable-check.patch"
+  patch -Np1 -i "${srcdir}/nfs-check-gssd-running-before-krb5i-auth.patch"
+  # fix nfs kernel oops
+  # #37866
+  patch -Np1 -i "${srcdir}/rpc_pipe-remove-the-clntXX-dir-if-creating-the-pipe-fails.patch"
+  patch -Np1 -i "${srcdir}/sunrpc-add-an-info-file-for-the-dummy-gssd-pipe.patch"
+  patch -Np1 -i "${srcdir}/rpc_pipe-fix-cleanup-of-dummy-gssd-directory-when-notification-fails.patch"
 
   if [ "${CARCH}" = "x86_64" ]; then
     cat "${srcdir}/config.x86_64" > ./.config
@@ -121,7 +143,7 @@ build() {
   ####################
 
   # build!
-  make ${MAKEFLAGS} -j9 LOCALVERSION= bzImage modules
+  make ${MAKEFLAGS} -j8 LOCALVERSION= bzImage modules
 }
 
 package() {
