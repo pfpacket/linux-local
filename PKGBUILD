@@ -1,7 +1,7 @@
 # $Id$
 # Maintainer: Ryo Munakata <afpacket@gmail.com>
 
-pkgname=linux-latest-stable
+pkgname=linux-stable
 #pkgbase=linux               # Build stock -ARCH kernel
 #pkgbase=linux-custom       # Build kernel with a different name
 _kernel_major=3.12
