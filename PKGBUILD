@@ -23,7 +23,6 @@ source=(# the main kernel config files
         'criu-no-expert.patch'
         'sunrpc-create-a-new-dummy-pipe-for-gssd-to-hold-open.patch'
         'sunrpc-replace-gssd_running-with-more-reliable-check.patch'
-        'nfs-check-gssd-running-before-krb5i-auth.patch'
         'rpc_pipe-remove-the-clntXX-dir-if-creating-the-pipe-fails.patch'
         'sunrpc-add-an-info-file-for-the-dummy-gssd-pipe.patch'
         'rpc_pipe-fix-cleanup-of-dummy-gssd-directory-when-notification-fails.patch'
@@ -35,7 +34,6 @@ md5sums=('SKIP'
          'd50c1ac47394e9aec637002ef3392bd1'
          'd4a75f77e6bd5d700dcd534cd5f0dfce'
          'dc86fdc37615c97f03c1e0c31b7b833a'
-         '88eef9d3b5012ef7e82af1af8cc4e517'
          'cec0bb8981936eab2943b2009b7a6fff'
          '88d9cddf9e0050a76ec4674f264fb2a1'
          'cb9016630212ef07b168892fbcfd4e5d'
@@ -54,7 +52,7 @@ replaces=("kernel26${_kernelname}")
 backup=("etc/mkinitcpio.d/${pkgname}.preset")
 install=linux.install
 
-_git_tree_path="/home/devm33/Develop/kernel_dev/linux-stable"
+_git_tree_path="/home/devm33/Develop/kernel_dev/linux"
 
 # module.symbols md5sums
 # x86_64
@@ -64,8 +62,8 @@ prepare() {
   rm -f "${srcdir}/${_srcname}"
   ln -s "${_git_tree_path}" "${srcdir}/${_srcname}"
   cd "${srcdir}/${_srcname}"
-  git checkout linux-${_kernel_major}.y
-  git pull origin
+  git fetch --all --prune
+  git reset --hard v${_kernel_major}
 
   # add upstream patch
   # patch -p1 -i "${srcdir}/patch-${pkgver}"
@@ -85,7 +83,6 @@ prepare() {
   # fix 15 seocnds nfs delay
   patch -Np1 -i "${srcdir}/sunrpc-create-a-new-dummy-pipe-for-gssd-to-hold-open.patch"
   patch -Np1 -i "${srcdir}/sunrpc-replace-gssd_running-with-more-reliable-check.patch"
-  patch -Np1 -i "${srcdir}/nfs-check-gssd-running-before-krb5i-auth.patch"
   # fix nfs kernel oops
   # #37866
   patch -Np1 -i "${srcdir}/rpc_pipe-remove-the-clntXX-dir-if-creating-the-pipe-fails.patch"
